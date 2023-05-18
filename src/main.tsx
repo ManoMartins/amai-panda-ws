@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { QueryClientProvider } from 'react-query'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
-
+import 'react-datepicker/dist/react-datepicker.css'
 import App from './App'
 import { theme } from './styles/theme'
 

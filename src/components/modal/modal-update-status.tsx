@@ -49,7 +49,7 @@ export function ModalUpdateStatus({
                 <ModalHeader>Atualizar status</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <Select ref={ref}>
+                    <Select id={'status'} ref={ref}>
                         <option value={Status.WAITING_PAYMENT}>
                             Aguardando pagamento
                         </option>
@@ -64,6 +64,7 @@ export function ModalUpdateStatus({
                         Fechar
                     </Button>
                     <Button
+                        data-test={'update'}
                         colorScheme="pink"
                         onClick={handleUpdate}
                         isLoading={updateStatus.isLoading}

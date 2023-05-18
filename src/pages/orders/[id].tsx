@@ -23,11 +23,13 @@ import { useOrder } from '../../services/order/queries/use-order'
 import { Status } from '../../@types/order/status.d'
 import { useDenyExchangeRequestOrder } from '../../services/order/mutations/use-deny-exchange-request-order'
 import { useAcceptExchangeRequestOrder } from '../../services/order/mutations/use-accept-exchange-request-order'
+import { useExchangeReceivedOrder } from '../../services/order/mutations/use-exchange-received-order'
 
 export default function OrderDetailsPage() {
     const { id } = useParams()
 
     const { data, isLoading } = useOrder(id)
+    const exchangeReceivedOrder = useExchangeReceivedOrder()
     const denyExchangeRequestOrder = useDenyExchangeRequestOrder()
     const acceptExchangeRequestOrder = useAcceptExchangeRequestOrder()
 
@@ -37,10 +39,7 @@ export default function OrderDetailsPage() {
         if (!id) return
 
         try {
-            await acceptExchangeRequestOrder.mutateAsync({
-                id,
-                voucherCode: '',
-            })
+            await acceptExchangeRequestOrder.mutateAsync({ id })
         } catch (error) {
             console.log(error)
         }
@@ -50,11 +49,21 @@ export default function OrderDetailsPage() {
         if (!id) return
 
         try {
-            await denyExchangeRequestOrder.mutateAsync({ id, voucherCode: '' })
+            await denyExchangeRequestOrder.mutateAsync({ id })
         } catch (error) {
             console.log(error)
         }
     }, [id, denyExchangeRequestOrder])
+
+    const handleExchangeReceived = useCallback(async () => {
+        if (!id) return
+
+        try {
+            await exchangeReceivedOrder.mutateAsync({ id })
+        } catch (error) {
+            console.log(error)
+        }
+    }, [id, exchangeReceivedOrder])
 
     return (
         <Box>
@@ -100,12 +109,39 @@ export default function OrderDetailsPage() {
                                         size={'xs'}
                                         colorScheme={'pink'}
                                     >
-                                        <Button>Aceitar</Button>
-                                        <Button variant={'outline'}>
+                                        <Button
+                                            data-test={
+                                                'accept-exchange-request'
+                                            }
+                                            onClick={
+                                                handleAcceptExchangeRequest
+                                            }
+                                        >
+                                            Aceitar
+                                        </Button>
+                                        <Button
+                                            onClick={handleDenyExchangeRequest}
+                                            variant={'outline'}
+                                        >
                                             Recusar
                                         </Button>
                                     </ButtonGroup>
-                                ) : (
+                                ) : data.data.status ===
+                                  Status.ACCEPT_EXCHANGE_REQUEST ? (
+                                    <ButtonGroup
+                                        ml={'4'}
+                                        size={'xs'}
+                                        colorScheme={'pink'}
+                                    >
+                                        <Button
+                                            data-test={'exchange-received'}
+                                            onClick={handleExchangeReceived}
+                                        >
+                                            Produto recebido
+                                        </Button>
+                                    </ButtonGroup>
+                                ) : data.data.status !==
+                                  Status.EXCHANGE_RECEIVED ? (
                                     <Button
                                         ml={2}
                                         size={'xs'}
@@ -115,7 +151,7 @@ export default function OrderDetailsPage() {
                                     >
                                         Alterar status
                                     </Button>
-                                )}
+                                ) : null}
                             </Row>
                             <Row label={'Nome do cliente'}>
                                 {data.data.user.name}

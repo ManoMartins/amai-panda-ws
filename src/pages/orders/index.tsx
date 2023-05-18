@@ -21,6 +21,7 @@ import { Pagination } from '../../components/pagination'
 import { Link } from 'react-router-dom'
 import { useOrders } from '../../queries/orders/use-orders'
 import dayjs from 'dayjs'
+import { formatCurrency } from '../../utils/format-currency'
 
 export default function OrderListPage() {
     const { data } = useOrders()
@@ -67,11 +68,17 @@ export default function OrderListPage() {
                                         ) || 0}
                                     </Td>
 
-                                    <Td>{order.totalInCents}</Td>
-
-                                    <Td>{dayjs().format('MMMM DD[,] YYYY')}</Td>
+                                    <Td>
+                                        {formatCurrency(order.totalInCents)}
+                                    </Td>
 
                                     <Td>
+                                        {dayjs(order.createdAt).format(
+                                            'MMMM DD[,] YYYY'
+                                        )}
+                                    </Td>
+
+                                    <Td data-test={'status'}>
                                         <Badge
                                             colorScheme={
                                                 order.status.colorScheme
@@ -89,6 +96,7 @@ export default function OrderListPage() {
                                                 fontSize={'sm'}
                                                 colorScheme={'pink'}
                                                 variant={'outline'}
+                                                data-test={'more-details'}
                                             >
                                                 Mais detalhes
                                             </Button>
